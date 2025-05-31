@@ -2,11 +2,51 @@ const ps = require('prompt-sync');
 const prompt = ps();
 const fs = require('fs');
 const { platform } = require('os');
+const crypto = require('crypto');
 
 
+// Fungsi Hashing
+function generateHash(data, algorithm = 'sha256') {
+    const hash = crypto.createHash(algorithm);
+    hash.update(data);
+    return hash.digest('hex');
+}
 
+// Kunci rahasia (harus 32 byte untuk AES-256)
+const key = crypto.createHash('sha256').update('kata-rahasia-ku').digest(); 
 
+// IV (Initialization Vector) harus 16 byte
+const iv = Buffer.alloc(16, 0); // 16 byte kosong, hanya untuk contoh sederhana
 
+function encrypt(text) {
+  const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
+  let encrypted = cipher.update(text, 'utf8', 'hex');
+  encrypted += cipher.final('hex');
+  return encrypted;
+}
+
+function decrypt(encryptedText) {
+  const decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
+  let decrypted = decipher.update(encryptedText, 'hex', 'utf8');
+  decrypted += decipher.final('utf8');
+  return decrypted;
+}
+
+function auth(){
+    const auth1 = "c7c39e078e203379fc43a0faf63dd2b7b40bb2edbd8400fdb13458715d419a2a"
+    console.log('=========== Password Manager ===========')
+    console.log('\n')
+    let passInput = prompt('Tolong Masukkan Passwordnya : ')
+
+    if(generateHash(passInput) == auth1){
+        console.log('Password Benar!\n')
+        main()
+    }else{
+        console.log('Password Salah!')
+        return 0;
+    }
+
+}
 
 
 function main(){
@@ -29,29 +69,35 @@ function main(){
 
 
 function showList(){
-    // reading a JSON file asynchronously
-fs.readFile("userData.json", (error, data) => {
-    // if the reading process failed,
-    // throwing the error
-    if (error) {
-      // logging the error
-      console.error(error);
-  
-      throw err;
+      // Membaca isi file data.json
+    const rawData = fs.readFileSync('userData.json');
+    const data = JSON.parse(rawData);
+
+    // Menyimpan key utama ke dalam array
+    const akunList = Object.keys(data);
+
+    // Menyetak daftar key utama
+    console.log('\nDaftar akun secara tersimpan:');
+    akunList.forEach((akun, index) => {
+     console.log(`${index + 1}. ${decrypt(akun)}`);
+    });
+
+    // Menyesuaikan input user dengan index array
+    let unindexedplatformInput = prompt('Pilih Platform Yang Ingin Anda Lihat : ')
+    let indexedPlatformInput = parseInt(unindexedplatformInput) - 1;
+
+    //Menyuruh User untuk memilih Platform dari Akun yang disimpan
+    if(indexedPlatformInput >= 0 && indexedPlatformInput < akunList.length) {
+     const selectedKey = akunList[indexedPlatformInput];
+     const akunData = data[selectedKey];
+
+     console.log(`\nDetail akun "${decrypt(selectedKey)}":`);
+     console.log(`Nama    : ${decrypt(akunData.Code1)}`);
+     console.log(`Password: ${decrypt(akunData.Code2)}`);
+    } else {
+     console.log('\n❌ Index tidak valid. Silakan coba lagi.');
     }
-  
-    // parsing the JSON object
-    // to convert it to a JavaScript object
-    let Database = JSON.parse(data);
-  
-    // printing the JavaScript object
-    // retrieved from the JSON file
-    if(Database !== '{}'){
-        console.log(Database)
-    }else{
-        console.log('Daftar Password Masih Kosong')
-    }
-  });
+
     
 }
 
@@ -73,9 +119,9 @@ function addPassword(){
     
     
         // Modify your JSON object
-        obj[passwordPlatform] = {
-            "Nama" : passwordName,
-            "Password" : passwordCode
+        obj[encrypt(passwordPlatform)] = {
+            "Code1" : encrypt(passwordName),
+            "Code2" : encrypt(passwordCode)
         };
     
     
@@ -96,6 +142,6 @@ function addPassword(){
 }
 
 
-main()
+auth()
 
 

@@ -1,5 +1,5 @@
 {
-  "name": "random",
+  "name": "package",
   "version": "1.0.0",
   "description": "Another random project",
   "main": "index.js",
@@ -9,6 +9,15 @@
   "author": "Fajrul",
   "license": "ISC",
   "dependencies": {
+    "crypto": "^1.0.1",
     "prompt-sync": "^4.2.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FajrulIhsann/password-manager.git"
+  },
+  "bugs": {
+    "url": "https://github.com/FajrulIhsann/password-manager/issues"
+  },
+  "homepage": "https://github.com/FajrulIhsann/password-manager#readme"
 }
