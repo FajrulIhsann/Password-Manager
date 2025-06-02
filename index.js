@@ -77,7 +77,7 @@ function showList(){
     const akunList = Object.keys(data);
 
     // Menyetak daftar key utama
-    console.log('\nDaftar akun secara tersimpan:');
+    console.log('\nDaftar akun yang tersimpan:');
     akunList.forEach((akun, index) => {
      console.log(`${index + 1}. ${decrypt(akun)}`);
     });
