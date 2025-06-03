@@ -1,5 +1,5 @@
 const ps = require('prompt-sync');
-const prompt = ps();
+const prompt = ps({sigint : true});
 const fs = require('fs');
 const { platform } = require('os');
 const crypto = require('crypto');
@@ -36,7 +36,7 @@ function auth(){
     const auth1 = "c7c39e078e203379fc43a0faf63dd2b7b40bb2edbd8400fdb13458715d419a2a"
     console.log('=========== Password Manager ===========')
     console.log('\n')
-    let passInput = prompt('Tolong Masukkan Passwordnya : ')
+    let passInput = prompt('Tolong Masukkan Passwordnya : ' , {echo: '*'})
 
     if(generateHash(passInput) == auth1){
         console.log('Password Benar!\n')
